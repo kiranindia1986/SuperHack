@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Technician Copilot - MVP</title>
+  <style>
+    :root{
+      --bg:#0f1320; --panel:#12172a; --muted:#1a2036;
+      --card:#151c31; --text:#e6ecff; --sub:#9fb0ff;
+      --brand:#6a8dff; --brand-2:#a86aff; --ok:#2ecc71; --warn:#ffb020; --bad:#ff5a73;
+      --ring:rgba(106,141,255,.3);f
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+      color:var(--text); background:linear-gradient(135deg, #0b0f1b, #131a2f 60%, #0b0f1b);
+      min-height:100vh;
+    }
+    /* Top bar */
+    .topbar{
+      position:sticky; top:0; z-index:10;
+      backdrop-filter:saturate(140%) blur(6px);
+      background:linear-gradient(90deg, rgba(106,141,255,.12), rgba(168,106,255,.12));
+      border-bottom:1px solid rgba(255,255,255,.06);
+    }
+    .topbar-inner{
+      max-width:1200px; margin:auto; display:flex; align-items:center; gap:16px;
+      padding:14px 20px;
+    }
+    .logo{
+      width:36px; height:36px; border-radius:12px;
+      background:linear-gradient(135deg, var(--brand), var(--brand-2));
+      display:grid; place-items:center; font-weight:900; color:#0b0f1b; box-shadow:0 8px 24px rgba(106,141,255,.25);
+    }
+    .title{ font-size:18px; font-weight:800; letter-spacing:.2px }
+    .pill{
+      margin-left:auto; font-size:12px; color:#0b0f1b; font-weight:700;
+      background:linear-gradient(135deg, var(--brand), var(--brand-2));
+      padding:6px 10px; border-radius:999px; box-shadow:0 8px 24px rgba(168,106,255,.25);
+    }
+
+    /* Layout */
+    .wrap{ max-width:1200px; margin:18px auto; padding:0 16px; }
+    .grid{
+      display:grid; grid-template-columns: 340px 1fr; gap:18px;
+    }
+    @media (max-width: 960px){ .grid{ grid-template-columns:1fr; } }
+
+    /* Panels */
+    .panel{ background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06);
+      border-radius:16px; overflow:hidden; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+    .panel-head{ padding:14px 14px 10px; border-bottom:1px solid rgba(255,255,255,.06);
+      background:linear-gradient(180deg, rgba(255,255,255,.02), transparent); }
+    .panel-head h2{ margin:0; font-size:15px; letter-spacing:.3px }
+    .panel-body{ padding:12px; }
+
+    /* Controls */
+    .controls{ display:flex; gap:8px; margin-bottom:10px; }
+    .input{
+      flex:1; display:flex; align-items:center; gap:8px;
+      background:var(--card); border:1px solid rgba(255,255,255,.06); border-radius:10px;
+      padding:8px 10px; color:var(--text);
+    }
+    .input input{
+      width:100%; background:transparent; border:none; outline:none; color:var(--text);
+    }
+    .btn{
+      background:linear-gradient(135deg, var(--brand), var(--brand-2));
+      border:none; color:#0b0f1b; font-weight:800; padding:10px 12px; border-radius:10px; cursor:pointer;
+      box-shadow:0 10px 24px rgba(106,141,255,.25); transition:transform .08s ease;
+    }
+    .btn:active{ transform:translateY(1px) }
+    .btn.ghost{
+      background:transparent; color:var(--sub); border:1px solid rgba(255,255,255,.08);
+      box-shadow:none;
+    }
+
+    /* Ticket list */
+    .ticket{ background:var(--card); border:1px solid rgba(255,255,255,.06);
+      border-radius:12px; padding:10px; margin:8px 0; cursor:pointer; transition: border .15s, transform .08s; }
+    .ticket:hover{ border-color:var(--ring) }
+    .ticket .head{ display:flex; align-items:center; gap:8px; }
+    .ticket .id{ font-weight:800; color:var(--sub); }
+    .badge{ font-size:11px; padding:4px 8px; border-radius:999px; font-weight:800; letter-spacing:.2px; }
+    .hi{ background:rgba(255,90,115,.18); color:#ff9aa8; border:1px solid rgba(255,90,115,.3) }
+    .med{ background:rgba(255,176,32,.18); color:#ffd28a; border:1px solid rgba(255,176,32,.3) }
+    .lo{ background:rgba(46,204,113,.18); color:#a1f0bf; border:1px solid rgba(46,204,113,.3) }
+    .subj{ margin:6px 0 0; color:#e9efff; font-weight:600 }
+    .meta{ font-size:12px; color:#9db0ff; opacity:.9 }
+
+    /* Detail */
+    .ticket-card{ background:var(--card); border:1px solid rgba(255,255,255,.06);
+      border-radius:14px; padding:12px; }
+    .desc{ white-space:pre-wrap; color:#cfe0ff; background:var(--muted); border:1px solid rgba(255,255,255,.06);
+      padding:10px; border-radius:10px; }
+
+    /* Tabs */
+    .tabs{ display:flex; gap:6px; margin:10px 0 8px; }
+    .tab{ padding:8px 10px; border-radius:10px; font-weight:700; cursor:pointer;
+      color:var(--sub); border:1px solid transparent; }
+    .tab.active{ color:#0b0f1b; background:linear-gradient(135deg, var(--brand), var(--brand-2));
+      box-shadow:0 8px 20px rgba(106,141,255,.25) }
+    .tabpanel{ display:none; }
+    .tabpanel.active{ display:block; animation:fade .16s ease }
+    @keyframes fade{ from{opacity:.4; transform: translateY(2px)} to{opacity:1; transform:none} }
+
+    .actions{ display:flex; gap:8px; flex-wrap:wrap; margin:10px 0 }
+    .btn.small{ padding:8px 10px; font-size:13px; }
+
+    .out{ display:grid; gap:10px; }
+    .out .card{ background:var(--muted); border:1px solid rgba(255,255,255,.06);
+      border-radius:12px; padding:10px; }
+    .out pre{ margin:0; white-space:pre-wrap; color:#eaf0ff }
+
+    /* Toast */
+    .toast{
+      position:fixed; right:18px; bottom:18px; z-index:99; min-width:220px;
+      background:linear-gradient(135deg, rgba(106,141,255,.2), rgba(168,106,255,.2));
+      border:1px solid rgba(255,255,255,.12); color:#eaf0ff; padding:10px 12px; border-radius:12px;
+      box-shadow:0 12px 30px rgba(0,0,0,.35); display:none;
+    }
+    .toast.show{ display:block; animation:pop .18s ease }
+    @keyframes pop{ from{ transform:translateY(6px); opacity:.2 } to{ transform:none; opacity:1 } }
+
+    /* Helpers */
+    .empty{ opacity:.7; border:1px dashed rgba(255,255,255,.1); border-radius:12px; padding:16px; text-align:center }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="logo">TC</div>
+      <div class="title">Technician Copilot - MVP</div>
+      <div class="pill">SuperHack 2025</div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="grid">
+      <!-- LEFT: Tickets -->
+      <section class="panel">
+        <div class="panel-head"><h2>Tickets</h2></div>
+        <div class="panel-body">
+          <div class="controls">
+            <div class="input">
+              
+              <input id="search" placeholder="Search by subject, requester, or keyword…" oninput="filterTickets()" />
+            </div>
+            <button class="btn" onclick="loadSamples()">Load samples</button>
+            <button class="btn ghost" onclick="listTickets()">Refresh</button>
+          </div>
+          <div id="tickets"></div>
+        </div>
+      </section>
+
+      <!-- RIGHT: Detail -->
+      <section class="panel">
+        <div class="panel-head"><h2>Technician Workspace</h2></div>
+        <div class="panel-body">
+          <div id="detail" class="empty">Select a ticket on the left to begin.</div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div id="toast" class="toast">Action completed</div>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

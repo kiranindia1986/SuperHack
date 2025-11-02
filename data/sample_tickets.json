@@ -1,0 +1,29 @@
+[
+  {
+    "id": "TIC-1001",
+    "subject": "Printer not working on 3rd floor",
+    "description": "User cannot print; driver shows error 0x00000bc4 after a Windows update. Spooler might be stuck.",
+    "priority": "High",
+    "category": "Hardware",
+    "requester": "john.doe@acme.com",
+    "created_at": "2025-10-16T10:00:00Z"
+  },
+  {
+    "id": "TIC-1002",
+    "subject": "VPN failing with auth error",
+    "description": "Several users report VPN auth failures since yesterday. DNS lookups also seem slow. Could be MFA or group policy.",
+    "priority": "Medium",
+    "category": "Network",
+    "requester": "secops@acme.com",
+    "created_at": "2025-10-16T09:10:00Z"
+  },
+  {
+    "id": "TIC-1003",
+    "subject": "Outlook stuck syncing inbox",
+    "description": "Outlook profile shows sync errors; OST file may be corrupted. Add-ins enabled for CRM plugin.",
+    "priority": "Low",
+    "category": "Email",
+    "requester": "sales.lead@acme.com",
+    "created_at": "2025-10-15T16:30:00Z"
+  }
+]
